@@ -109,56 +109,57 @@ RCT_EXPORT_METHOD(openSettings:(RCTPromiseResolveBlock)resolve rejecter:(RCTProm
 
 RCT_REMAP_METHOD(getPermissionStatus, getPermissionStatus:(RNPType)type json:(id)json resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSString *status;
-
-    switch (type) {
-
-        case RNPTypeLocation: {
-            NSString *locationPermissionType = [RCTConvert NSString:json];
-            status = [RNPLocation getStatusForType:locationPermissionType];
-            break;
+    if (type == RNPTypeNotification) {
+        [RNPNotification getStatus:^(NSString *status) {
+            resolve(status);
+        }];
+    } else {
+        NSString *status;
+        
+        switch (type) {
+            case RNPTypeLocation: {
+                NSString *locationPermissionType = [RCTConvert NSString:json];
+                status = [RNPLocation getStatusForType:locationPermissionType];
+                break;
+            }
+            case RNPTypeCamera:
+                status = [RNPAudioVideo getStatus:@"video"];
+                break;
+            case RNPTypeMicrophone:
+                status = [RNPAudioVideo getStatus:@"audio"];
+                break;
+            case RNPTypePhoto:
+                status = [RNPPhoto getStatus];
+                break;
+            case RNPTypeContacts:
+                status = [RNPContacts getStatus];
+                break;
+            case RNPTypeEvent:
+                status = [RNPEvent getStatus:@"event"];
+                break;
+            case RNPTypeReminder:
+                status = [RNPEvent getStatus:@"reminder"];
+                break;
+            case RNPTypeBluetooth:
+                status = [RNPBluetooth getStatus];
+                break;
+            case RNPTypeBackgroundRefresh:
+                status = [RNPBackgroundRefresh getStatus];
+                break;
+            case RNPTypeSpeechRecognition:
+                status = [RNPSpeechRecognition getStatus];
+                break;
+            case RNPTypeMediaLibrary:
+                status = [RNPMediaLibrary getStatus];
+            case RNPTypeMotion:
+                status = [RNPMotion getStatus];
+                break;
+            default:
+                break;
         }
-        case RNPTypeCamera:
-            status = [RNPAudioVideo getStatus:@"video"];
-            break;
-        case RNPTypeMicrophone:
-            status = [RNPAudioVideo getStatus:@"audio"];
-            break;
-        case RNPTypePhoto:
-            status = [RNPPhoto getStatus];
-            break;
-        case RNPTypeContacts:
-            status = [RNPContacts getStatus];
-            break;
-        case RNPTypeEvent:
-            status = [RNPEvent getStatus:@"event"];
-            break;
-        case RNPTypeReminder:
-            status = [RNPEvent getStatus:@"reminder"];
-            break;
-        case RNPTypeBluetooth:
-            status = [RNPBluetooth getStatus];
-            break;
-        case RNPTypeNotification:
-            status = [RNPNotification getStatus];
-            break;
-        case RNPTypeBackgroundRefresh:
-            status = [RNPBackgroundRefresh getStatus];
-            break;
-        case RNPTypeSpeechRecognition:
-            status = [RNPSpeechRecognition getStatus];
-            break;
-        case RNPTypeMediaLibrary:
-            status = [RNPMediaLibrary getStatus];
-            break;
-        case RNPTypeMotion:
-            status = [RNPMotion getStatus];
-            break;
-        default:
-            break;
+        
+        resolve(status);
     }
-
-    resolve(status);
 }
 
 RCT_REMAP_METHOD(requestPermission, permissionType:(RNPType)type json:(id)json resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
